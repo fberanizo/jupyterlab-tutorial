@@ -1,0 +1,22 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2020-05-12T13:04:48-03:00",
+  "id": "jupyterlab-extension-development",
+  "duration": 46,
+  "title": "JupyterLab Extension Development",
+  "summary": "JupyterLab Extension Development",
+  "source": "codelabs/jupyterlab-extension.md",
+  "theme": "",
+  "status": [
+    "draft"
+  ],
+  "category": [
+    "cloud"
+  ],
+  "tags": [],
+  "feedback": "github.com/fberanizo/jupyterlab-tutorial",
+  "url": "jupyterlab-extension-development"
+}

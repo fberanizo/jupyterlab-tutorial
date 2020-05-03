@@ -1,0 +1,477 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>JupyterLab Extension Development</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/codelab-elements/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  id="jupyterlab-extension-development"
+                  title="JupyterLab Extension Development"
+                  environment="web"
+                  feedback-link="github.com/fberanizo/jupyterlab-tutorial">
+    
+      <google-codelab-step label="Visão Geral" duration="3">
+        <p><a href="https://jupyter.org/" target="_blank">Project Jupyter</a> trabalha para construir padrões, serviços e interfaces para diversas linguagens de programação. Uma de suas aplicações mais importantes é a interface web <a href="https://jupyterlab.readthedocs.io/en/stable/" target="_blank">JupyterLab</a>. Tão importante que é usado em plataformas como o <a href="https://docs.aws.amazon.com/sagemaker/latest/dg/gs-studio-end-to-end.html#studio-tour-notebooks" target="_blank">AWS SageMaker Studio</a> e o <a href="https://colab.research.google.com/notebooks/basic_features_overview.ipynb" target="_blank">Google Colaboratory</a>.</p>
+<h2 is-upgraded>O Que Você Vai Aprender</h2>
+<ul>
+<li>Noções básicas sobre o Jupyter Notebook</li>
+<li>Como criar um ambiente de desenvolvimento para o JupyterLab</li>
+<li>Como criar extensões usando npm e TypeScript</li>
+<li>Como instalar e usar as extensões criadas</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Introdução ao Jupyter Notebook" duration="3">
+        <p>Os principais conceitos que envolvem o JupyterLab são descritos a seguir:</p>
+<h2 is-upgraded>Kernels</h2>
+<p>Kernel é o programa que roda o código do notebook. O Kernel Python é o principal, porém kernels de <a href="https://github.com/jupyter/jupyter/wiki/Jupyter-kernels" target="_blank">outras linguagens</a> podem ser instalados.</p>
+<p><strong>Cada notebook tem sua própria memória e seu próprio kernel.</strong></p>
+<p>Use o menu <code>Kernel</code> para reiniciar ou trocar a linguagem de programação do kernel para o notebook visualizado.</p>
+<h2 is-upgraded>JupyterLab Workspaces</h2>
+<p>Workspaces mantém o estado do JupyterLab: abas abertas e layout. Quando a página é recarregada o estado do workspace é recuperado.</p>
+<p>O workspace padrão é acessado diretamente na URL /lab:<br><code>http(s)://&lt;server:port&gt;/&lt;lab-location&gt;/lab</code></p>
+<p>Outros workspaces têm o nome na URL:<br><code>http(s)://&lt;server:port&gt;/&lt;lab-location&gt;/lab/workspaces/foo</code></p>
+<p><strong>Workspaces salvam o estado no backend e podem ser compartilhados por usuários (ou browsers).</strong></p>
+<h2 is-upgraded>JupyterLab Extensions</h2>
+<p>Extensões podem alterar ou adicionar qualquer parte do JupyterLab. Por exemplo, é possível:</p>
+<ul>
+<li>Criar novos temas e estilos (eg. <a href="https://github.com/mohirio/jupyterlab-horizon-theme" target="_blank">horizon-theme</a>)</li>
+<li>Adicionar visualizadores/editores de arquivo</li>
+<li>Criar renderizadores em células de notebooks (eg. <a href="https://github.com/chaoleili/jupyterlab_tensorboard" target="_blank">tensorboard</a>)</li>
+<li>Adicionar <a href="https://jupyterlab.readthedocs.io/en/stable/user/interface.html#menu-bar" target="_blank">itens em menus e barra de ferramentas</a></li>
+<li>Adicionar <a href="https://jupyterlab.readthedocs.io/en/stable/user/interface.html#keyboard-shortcuts" target="_blank">atalhos de teclados</a></li>
+</ul>
+<p>Extensões são <code>npm packages</code> (projetos Javascript).</p>
+<p><a href="https://github.com/jupyterlab/jupyterlab/tree/master/packages" target="_blank">De fato, todo o JupyterLab é uma coleção de extensões...</a></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Ambiente de desenvolvimento" duration="10">
+        <p>Será necessário <a href="https://nodejs.org/en/" target="_blank">NodeJS</a> e <a href="https://www.python.org/downloads/" target="_blank">Python&gt;=3.6</a>.<br><br>Instale também o Python package <a href="https://github.com/cookiecutter/cookiecutter#cookiecutter" target="_blank">cookiecutter</a> para criar seus projetos mais rapidamente.<br><br>O uso de <a href="https://virtualenv.pypa.io/en/latest/installation.html#via-pip" target="_blank">virtualenv</a> ou <a href="https://virtualenvwrapper.readthedocs.io/en/latest/install.html#basic-installation" target="_blank">virtualenvwrapper</a> é aconselhado.</p>
+<p>Execute os seguintes comandos:</p>
+<pre><code># Fazer download do projeto
+git clone https://github.com/jupyterlab/jupyterlab/
+# Instalar dependências
+pip install -e .
+jlpm install
+# Construir artefatos
+jupyter lab build
+# Iniciar JupyterLab em http://localhost:8888/lab
+jupyter lab --NotebookApp.token=&#39;&#39; --NotebookApp.password=&#39;&#39;
+</code></pre>
+<p>Abra o browser em <a href="http://localhost:8888/lab" target="_blank">http://localhost:8888/lab</a></p>
+<p><strong>Pronto! Você já tem tudo o que é necessário para criar suas extensões.</strong></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Criar uma extensão em TypeScript" duration="15">
+        <p>O exemplo a seguir mostra como construir uma extensão simples. Quando a <em>query string</em><code>?open=notebook</code> existir (eg. <code>http://localhost:8888/lab/tree/path/to/folder/?open=notebook</code> todos os notebooks na pasta serão abertos.</p>
+<h2 is-upgraded>Estrutura do projeto</h2>
+<p><strong>Na pasta </strong><code>jupyterlab/packages/</code><strong>, crie o projeto usando </strong><code>cookiecutter https://github.com/jupyterlab/extension-cookiecutter-ts</code></p>
+<pre><code>author_name []: Your Name
+extension_name [myextension]: url-functions-extension
+project_short_description [A JupyterLab extension.]: A JupyterLab extension that creates some URL functions
+has_server_extension [n]: n
+repository [https://github.com/my_name/myextension]: https://github.com/my_name/url-functions-extension
+</code></pre>
+<p><strong>A seguinte estrutura será gerada:</strong></p>
+<pre><code>jupyterlab
+├─ ...
+└ packages
+   ├─ ...
+   ├── url-functions-extension
+   │   ├── LICENSE
+   │   ├── README.md
+   │   ├── package.json   &lt;- npm package definition
+   │   ├── src
+   │   │   └── index.ts   &lt;- TypeScript source
+   │   ├── style
+   │   │   └── index.css  &lt;- Stylesheet source
+   │   └── tsconfig.json  &lt;- TypeScript package definition
+   └ ...
+</code></pre>
+<p><strong>Na pasta </strong><code>jupyterlab/packages/url-functions-extension/</code><strong>, adicione as dependências do projeto:</strong></p>
+<pre><code>cd ./packages/url-functions-extension/
+jlpm add @jupyterlab/application
+jlpm add @jupyterlab/apputils
+jlpm add @jupyterlab/services
+</code></pre>
+<p>Crie/Edite os seguintes arquivos (os trechos sem alteração serão omitidos):</p>
+<h3 is-upgraded><code>src/index.ts</code></h3>
+<pre><code>import {
+  IRouter,
+  JupyterFrontEnd,
+  JupyterFrontEndPlugin
+} from &#39;@jupyterlab/application&#39;;
+
+import { ICommandPalette } from &#39;@jupyterlab/apputils&#39;;
+
+import { Contents } from &#39;@jupyterlab/services&#39;;
+
+/**
+ * The command IDs used by the url-functions plugin.
+ */
+namespace CommandIDs {
+  export const open = &#39;url-functions:open&#39;;
+}
+
+/**
+ * Initialization data for the url-functions extension.
+ */
+const extension: JupyterFrontEndPlugin&lt;void&gt; = {
+  id: &#39;url-functions-extension&#39;,
+  autoStart: true,
+  requires: [JupyterFrontEnd.IPaths, ICommandPalette, IRouter],
+  activate: (
+    app: JupyterFrontEnd,
+    paths: JupyterFrontEnd.IPaths,
+    palette: ICommandPalette,
+    router: IRouter
+  ) =&gt; {
+    console.log(&#39;JupyterLab extension url-functions-extension is activated!&#39;);
+
+    app.commands.addCommand(CommandIDs.open, {
+      label: &#39;Open all notebooks...&#39;,
+      execute: async () =&gt; {
+        const args = router.current;
+        // gets url path, then removes prefixes: `/lab/workspaces/foo`, `/lab`, `/tree`
+        const dirpath = args.path
+          .replace(new RegExp(`^${paths.urls.workspaces}\/([^?\/]+)`), &#39;&#39;)
+          .replace(new RegExp(`^${paths.urls.app}`), &#39;&#39;)
+          .replace(new RegExp(&#39;^/tree&#39;), &#39;&#39;);
+
+        // fetch the contents of dirpath
+        const item = await app.serviceManager.contents.get(dirpath);
+
+        if (item.type === &#39;directory&#39;) {
+          // filter by notebooks
+          const notebooks = item.content.filter(
+            (i: Contents.IModel) =&gt; i.type === &#39;notebook&#39;
+          );
+
+          // open notebooks
+          notebooks.forEach(({ path }: Contents.IModel) =&gt; {
+            void app.commands.execute(&#39;docmanager:open&#39;, { path });
+          });
+
+          const url = args.path + args.hash;
+          router.navigate(url);
+        }
+      }
+    });
+
+    palette.addItem({
+      command: CommandIDs.open,
+      category: &#39;File Operations&#39;,
+      args: {}
+    });
+
+    router.register({
+      command: CommandIDs.open,
+      pattern: /(\?open=notebook|\&amp;open=notebook)($|&amp;)/,
+      rank: 10 // High priority: 10:100.
+    });
+  }
+};
+
+export default extension;
+</code></pre>
+<h2 is-upgraded>Construir extensão</h2>
+<p><strong>Na pasta </strong><code>jupyterlab/packages/url-functions-extension/</code><strong> execute os seguintes comandos:</strong></p>
+<pre><code># Install dependencies
+jlpm
+# Build Typescript source
+jlpm build
+# Link your development version of the extension with JupyterLab
+jupyter labextension link .
+# Rebuild Typescript source after making changes
+jlpm build
+# Rebuild JupyterLab after making any changes
+jupyter lab build
+</code></pre>
+<p><strong>Na pasta </strong><code>jupyterlab/</code><strong> execute os seguintes comandos:</strong></p>
+<pre><code># Watch the source directory in another terminal tab
+jlpm watch
+# Run jupyterlab in watch mode in one terminal tab
+jupyter lab --watch --NotebookApp.token=&#39;&#39; --NotebookApp.password=&#39;&#39;
+</code></pre>
+<h2 is-upgraded>Testar extensão no JupyterLab</h2>
+<p>Abra o browser em <a href="http://localhost:8888/lab" target="_blank">http://localhost:8888/lab</a></p>
+<ol type="1">
+<li>Clique na aba &#34;Extension Manager&#34; no painel à esquerda. Habilite as extensões se necessário.<br><img alt="Uma imagem da interface do JupyterLab. A aba de \"Extension Manager\" está em destaque." src="img/5aaca4da6f5c7c00.png"></li>
+<li>Crie alguns notebooks.<br><img alt="Uma imagem da interface do JupyterLab. O menu File -> New -> Notebook está em destaque." src="img/718dc42002955fc6.png"></li>
+<li>Feche todas as abas.<br><img alt="Uma imagem da interface do JupyterLab. O menu File -> New -> Notebook está em destaque." src="img/93dcc11f14521fd5.png"></li>
+<li>Acesse a URL com <code>http://localhost:8888/lab?open=notebook</code> e veja se os arquivos são abertos.<br></li>
+</ol>
+<p><strong>Parabéns! Você criou a sua primeira extensão!</strong></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Adicionar Item à Barra de Ferramentas e Modal (Dialog)" duration="15">
+        <p>O exemplo a seguir mostra como construir uma extensão que adiciona elementos à interface web do JupyterLab. Um botão será adicionado à barra de ferramentas, e ao clicá-lo um modal exibirá os campos para declarar um parâmetro no código.<br><br>Parâmetros são variáveis seguidas por um comentário no formato do <a href="https://colab.research.google.com/notebooks/forms.ipynb" target="_blank">Google Colaboratory Forms</a>.</p>
+<p>Exemplos:</p>
+<ol type="1">
+<li><code>text = &#39;value&#39; #@param {type:&#34;string&#34;}</code></li>
+<li><code>dropdown = &#39;1st option&#39; #@param [&#34;1st option&#34;, &#34;2nd option&#34;, &#34;3rd option&#34;]</code></li>
+</ol>
+<h2 is-upgraded>Estrutura do projeto</h2>
+<p><strong>Na pasta </strong><code>jupyterlab/packages/</code><strong>, crie o projeto usando </strong><code>cookiecutter https://github.com/jupyterlab/extension-cookiecutter-ts</code></p>
+<pre><code>author_name []: Your Name
+extension_name [myextension]: parameters-extension
+project_short_description [A JupyterLab extension.]: A JupyterLab extension that allows to parameterize code
+has_server_extension [n]: n
+repository [https://github.com/my_name/myextension]: https://github.com/my_name/parameters-extension
+</code></pre>
+<p><strong>A seguinte estrutura será gerada:</strong></p>
+<pre><code>jupyterlab
+├─ ...
+└ packages
+   │   ├── LICENSE
+   │   ├── README.md
+   │   ├── package.json   &lt;- npm package definition
+   │   ├── src
+   │   │   └── index.ts   &lt;- TypeScript source
+   │   ├── style
+   │   │   └── index.css  &lt;- Stylesheet source
+   │   └── tsconfig.json  &lt;- TypeScript package definition
+   └ ...
+</code></pre>
+<p><strong>Na pasta </strong><code>jupyterlab/packages/parameters-extension/</code><strong>, adicione as dependências do projeto:</strong></p>
+<pre><code>cd ./packages/parameters-extension/
+jlpm add @jupyterlab/application
+jlpm add @jupyterlab/apputils
+jlpm add @jupyterlab/docregistry
+jlpm add @jupyterlab/notebook
+jlpm add @jupyterlab/ui-components
+jlpm add @lumino/disposable
+jlpm add @lumino/widgets
+</code></pre>
+<p>Crie/Edite os seguintes arquivos (os trechos sem alteração serão omitidos):</p>
+<h3 is-upgraded><code>src/svg.d.ts</code></h3>
+<pre><code>declare module &#39;*.svg&#39; {
+  const value: string;
+  export default value;
+}
+</code></pre>
+<h3 is-upgraded><code>style/icons/sliders.svg</code></h3>
+<pre><code>&lt;svg xmlns=&#34;http://www.w3.org/2000/svg&#34; width=&#34;20pt&#34; height=&#34;32&#34; viewBox=&#34;0 0 20 24&#34;&gt;
+    &lt;g  class=&#34;jp-icon3&#34; fill=&#34;#231f20&#34;&gt;
+        &lt;path d=&#34;M19 10.816h-.86c-.456-1.312-1.69-2.254-3.14-2.254-1.45 0-2.684.942-3.14 2.254H1c-.55 0-1 .454-1 1.016 0 .559.45 1.012 1 1.012h10.79c.39 1.43 1.679 2.48 3.21 2.48s2.82-1.05 3.21-2.48H19c.55 0 1-.453 1-1.012 0-.562-.45-1.016-1-1.016zm0 0M19 19.605H8.14c-.456-1.312-1.69-2.253-3.14-2.253-1.45 0-2.684.941-3.14 2.253H1c-.55 0-1 .454-1 1.016 0 .559.45 1.012 1 1.012h.79c.39 1.43 1.679 2.48 3.21 2.48s2.82-1.05 3.21-2.48H19c.55 0 1-.453 1-1.012 0-.562-.45-1.016-1-1.016zm0 0M1 4.395h.79c.39 1.43 1.679 2.48 3.21 2.48s2.82-1.05 3.21-2.48H19c.55 0 1-.454 1-1.016 0-.559-.45-1.012-1-1.012H8.14C7.685 1.055 6.45.113 5 .113c-1.45 0-2.684.942-3.14 2.254H1c-.55 0-1 .453-1 1.012 0 .562.45 1.016 1 1.016zm0 0&#34;/&gt;
+    &lt;/g&gt;
+&lt;/svg&gt;
+</code></pre>
+<h3 is-upgraded><code>tsconfig.json</code></h3>
+<pre><code>{
+  ...
+  &#34;files&#34;: [&#34;src/svg.d.ts&#34;],
+  ...
+}
+</code></pre>
+<h3 is-upgraded><code>src/index.ts</code></h3>
+<pre><code>import { IDisposable, DisposableDelegate } from &#39;@lumino/disposable&#39;;
+
+import { Widget } from &#39;@lumino/widgets&#39;;
+
+import {
+  JupyterFrontEnd,
+  JupyterFrontEndPlugin
+} from &#39;@jupyterlab/application&#39;;
+
+import { showDialog, Dialog, ToolbarButton } from &#39;@jupyterlab/apputils&#39;;
+
+import { DocumentRegistry } from &#39;@jupyterlab/docregistry&#39;;
+
+import { NotebookPanel, INotebookModel } from &#39;@jupyterlab/notebook&#39;;
+
+import { LabIcon } from &#39;@jupyterlab/ui-components&#39;;
+
+import slidersSvgstr from &#39;../style/icons/sliders.svg&#39;;
+
+/**
+ * Initialization data for the parameters-extension extension.
+ */
+const extension: JupyterFrontEndPlugin&lt;void&gt; = {
+  id: &#39;parameters-extension&#39;,
+  autoStart: true,
+  activate
+};
+
+export default extension;
+
+/**
+ * Activate the extension.
+ */
+function activate(app: JupyterFrontEnd) {
+  console.log(&#39;JupyterLab extension parameters-extension is activated!&#39;);
+
+  // Add Button to Toolbar
+  app.docRegistry.addWidgetExtension(&#39;Notebook&#39;, new ButtonExtension());
+}
+
+/**
+ * A notebook widget extension that adds a button to the toolbar.
+ */
+export class ButtonExtension
+  implements DocumentRegistry.IWidgetExtension&lt;NotebookPanel, INotebookModel&gt; {
+  createNew(
+    panel: NotebookPanel,
+    context: DocumentRegistry.IContext&lt;INotebookModel&gt;
+  ): IDisposable {
+    const button = new ToolbarButton({
+      icon: slidersIcon,
+      onClick: () =&gt; {
+        void showDialog({
+          title: &#39;Declare Parameter&#39;,
+          body: new Widget({ node: createForm() }),
+          buttons: [Dialog.cancelButton(), Dialog.okButton()]
+        });
+      },
+      tooltip: &#39;Declare Parameter&#39;
+    });
+
+    panel.toolbar.insertAfter(&#39;cellType&#39;, &#39;declareParameter&#39;, button);
+    return new DisposableDelegate(() =&gt; {
+      button.dispose();
+    });
+  }
+}
+
+function createForm() {
+  const body = document.createElement(&#39;div&#39;);
+
+  // Name Input
+  const nameTitle = document.createElement(&#39;label&#39;);
+  nameTitle.textContent = &#39;Variable Name:&#39;;
+  const name = document.createElement(&#39;input&#39;);
+  body.appendChild(nameTitle);
+  body.appendChild(name);
+
+  // Default Value Input
+  const defaultValueTitle = document.createElement(&#39;label&#39;);
+  defaultValueTitle.textContent = &#39;Default Value:&#39;;
+  const defaultValue = document.createElement(&#39;input&#39;);
+  body.appendChild(defaultValueTitle);
+  body.appendChild(defaultValue);
+
+  // Type Select
+  const typeTitle = document.createElement(&#39;label&#39;);
+  typeTitle.textContent = &#39;Variable Type:&#39;;
+  const type = document.createElement(&#39;select&#39;);
+  const options = [&#39;string&#39;, &#39;integer&#39;, &#39;number&#39;];
+  options.forEach(item =&gt; {
+    const option = document.createElement(&#39;option&#39;);
+    option.value = item;
+    option.textContent = item;
+    type.appendChild(option);
+  });
+  body.appendChild(typeTitle);
+  body.appendChild(type);
+
+  // Label Input
+  const labelTitle = document.createElement(&#39;label&#39;);
+  labelTitle.textContent = &#39;Label:&#39;;
+  const label = document.createElement(&#39;input&#39;);
+  body.appendChild(labelTitle);
+  body.appendChild(label);
+
+  // Description Input
+  const descriptionTitle = document.createElement(&#39;label&#39;);
+  descriptionTitle.textContent = &#39;Description:&#39;;
+  const description = document.createElement(&#39;textarea&#39;);
+  body.appendChild(descriptionTitle);
+  body.appendChild(description);
+
+  return body;
+}
+
+export const slidersIcon = new LabIcon({
+  name: &#39;parameters:sliders&#39;,
+  svgstr: slidersSvgstr
+});
+</code></pre>
+<h2 is-upgraded>Construir extensão</h2>
+<p><strong>Na pasta </strong><code>jupyterlab/packages/parameters-extension/</code><strong>, execute os seguintes comandos:</strong></p>
+<pre><code># Install dependencies
+jlpm
+# Build Typescript source
+jlpm build
+# Link your development version of the extension with JupyterLab
+jupyter labextension link .
+# Rebuild Typescript source after making changes
+jlpm build
+# Rebuild JupyterLab after making any changes
+jupyter lab build
+</code></pre>
+<p><strong>Na pasta </strong><code>jupyterlab/</code><strong> execute os seguintes comandos:</strong></p>
+<pre><code># Watch the source directory in another terminal tab
+jlpm watch
+# Run jupyterlab in watch mode in one terminal tab
+jupyter lab --watch --NotebookApp.token=&#39;&#39; --NotebookApp.password=&#39;&#39;
+</code></pre>
+<h2 is-upgraded>Testar extensão no JupyterLab</h2>
+<p>Abra o browser em <a href="http://localhost:8888/lab" target="_blank">http://localhost:8888/lab</a></p>
+<ol type="1">
+<li>Clique no ícone &#34;Parameters&#34; na barra de ferramentas<br><img alt="Uma imagem da interface do JupyterLab. O ícone \"Parameters\" está em destaque." src="img/4b79b2224621c387.png"></li>
+<li>Preencha os campos solicitados<br><img alt="Uma imagem da interface do JupyterLab. O modal \"Declarar Parâmetros\" está em destaque." src="img/5433aa2e9e0a7433.png"></li>
+<li>Veja se o código contém o parâmetro declarado no passo anterior.</li>
+</ol>
+<p><strong>Parabéns! Agora você sabe como criar elementos visuais usando extensões!</strong></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="JupyterLab no PlatIAgro" duration="0">
+        <h2 is-upgraded>E agora?</h2>
+<p>Acesse o fork do JupyterLab no repo do PlatIAgro:</p>
+<ul>
+<li><a href="https://github.com/platiagro/jupyterlab/" target="_blank">github.com/platiagro/jupyterlab</a></li>
+</ul>
+<p>Desenvolva alguma destas funcionalidades:</p>
+<ul>
+<li><a href="https://jira.cpqd.com.br/browse/PLATIA-579" target="_blank">Declarar parâmetros das tarefas/componentes no JupyterLab</a></li>
+<li><a href="https://jira.cpqd.com.br/browse/PLATIA-580" target="_blank">Criar células com trechos de código úteis do PlatIAgro SDK no JupyterLab</a></li>
+<li><a href="https://jira.cpqd.com.br/browse/PLATIA-581" target="_blank">Upload de .CSV e .TXT, criação de datasets, e edição do parâmetro dataset no JupyterLab</a></li>
+</ul>
+<h2 is-upgraded>Leitura adicional</h2>
+<ul>
+<li><a href="https://jupyterlab.readthedocs.io/en/stable/developer/extension_dev.html#" target="_blank">Extension Developer Guide</a></li>
+<li><a href="https://jupyterlab.readthedocs.io/en/stable/developer/extension_points.html" target="_blank">Common Extension Points</a></li>
+<li><a href="https://github.com/jupyterlab/jupyterlab/blob/master/CONTRIBUTING.md" target="_blank">Contributing to JupyterLab</a></li>
+<li><a href="https://jupyterlab.readthedocs.io/en/stable/developer/notebook.html#how-to-extend-the-notebook-plugin" target="_blank">How to extend the Notebook plugin</a></li>
+<li><a href="https://jupyterlab.readthedocs.io/en/stable/developer/extension_tutorial.html" target="_blank">Let&#39;s Make an Astronomy Picture of the Day JupyterLab Extension</a></li>
+</ul>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/codelab-elements/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/prettify.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/codelab-elements.js"></script>
+
+</body>
+</html>
